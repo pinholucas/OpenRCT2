@@ -185,7 +185,6 @@ private:
                             {
                                 if (gConfigGeneral.michael_bay_mode)
                                 {
-                                    // LUSCA
                                     audio_play_sound_at_location(SoundId::Crash, { tilePos.x, tilePos.y, tileElement->GetBaseZ()});
 
                                     sprite_misc_explosion_cloud_create(tilePos.x, tilePos.y, tileElement->GetBaseZ());
@@ -219,7 +218,6 @@ private:
                             {
                                 if (gConfigGeneral.michael_bay_mode)
                                 {
-                                    // LUSCA
                                     audio_play_sound_at_location(SoundId::Crash, { tilePos.x, tilePos.y, tileElement->GetBaseZ()});
 
                                     sprite_misc_explosion_cloud_create(tilePos.x, tilePos.y, tileElement->GetBaseZ());
@@ -254,7 +252,6 @@ private:
                             {
                                 if (gConfigGeneral.michael_bay_mode)
                                 {
-                                    // LUSCA
                                     audio_play_sound_at_location(SoundId::Crash, { tilePos.x, tilePos.y, tileElement->GetBaseZ()});
 
                                     sprite_misc_explosion_cloud_create(tilePos.x, tilePos.y, tileElement->GetBaseZ());

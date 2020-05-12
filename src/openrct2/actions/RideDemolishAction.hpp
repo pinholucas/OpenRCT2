@@ -10,6 +10,7 @@
 #pragma once
 
 #include "../Cheats.h"
+#include <openrct2/config/Config.h>
 #include "../Context.h"
 #include "../GameState.h"
 #include "../core/MemoryStream.h"
@@ -319,12 +320,13 @@ private:
 
                 auto removRes = GameActions::ExecuteNested(&trackRemoveAction);
 
-                // LUSCA
-                audio_play_sound_at_location(SoundId::Crash, { location.x, location.y, location.z });
+                if (gConfigGeneral.michael_bay_mode)
+                {
+                    audio_play_sound_at_location(SoundId::Crash, { location.x, location.y, location.z });
 
-                sprite_misc_explosion_cloud_create(location.x, location.y, location.z);
-                sprite_misc_explosion_flare_create(location.x, location.y, location.z);
-                // END
+                    sprite_misc_explosion_cloud_create(location.x, location.y, location.z);
+                    sprite_misc_explosion_flare_create(location.x, location.y, location.z);
+                }
 
                 if (removRes->Error != GA_ERROR::OK)
                 {

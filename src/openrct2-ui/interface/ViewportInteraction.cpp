@@ -12,6 +12,7 @@
 
 #include <algorithm>
 #include <openrct2/Context.h>
+#include <openrct2/config/Config.h>
 #include <openrct2/Editor.h>
 #include <openrct2/Game.h>
 #include <openrct2/GameState.h>
@@ -38,6 +39,7 @@
 #include <openrct2/world/Sprite.h>
 #include <openrct2/world/Surface.h>
 #include <openrct2/world/Wall.h>
+
 
 static void viewport_interaction_remove_scenery(TileElement* tileElement, const CoordsXY& mapCoords);
 static void viewport_interaction_remove_footpath(TileElement* tileElement, const CoordsXY& mapCoords);
@@ -507,12 +509,13 @@ static void viewport_interaction_remove_scenery(TileElement* tileElement, const 
         { mapCoords.x, mapCoords.y, tileElement->GetBaseZ() }, tileElement->AsSmallScenery()->GetSceneryQuadrant(),
         tileElement->AsSmallScenery()->GetEntryIndex());
 
-    // LUSCA
-    audio_play_sound_at_location(SoundId::Crash, { mapCoords.x, mapCoords.y, tileElement->GetBaseZ() });
+    if (gConfigGeneral.michael_bay_mode)
+    {
+        audio_play_sound_at_location(SoundId::Crash, { mapCoords.x, mapCoords.y, tileElement->GetBaseZ() });
 
-    sprite_misc_explosion_cloud_create(mapCoords.x, mapCoords.y, tileElement->GetBaseZ() );
-    sprite_misc_explosion_flare_create(mapCoords.x, mapCoords.y, tileElement->GetBaseZ() );
-
+        sprite_misc_explosion_cloud_create(mapCoords.x, mapCoords.y, tileElement->GetBaseZ());
+        sprite_misc_explosion_flare_create(mapCoords.x, mapCoords.y, tileElement->GetBaseZ());
+    }
 
     GameActions::Execute(&removeSceneryAction);
 }
@@ -573,11 +576,13 @@ void viewport_interaction_remove_park_entrance(TileElement* tileElement, CoordsX
     }
     auto parkEntranceRemoveAction = ParkEntranceRemoveAction({ mapCoords.x, mapCoords.y, tileElement->GetBaseZ() });
 
-    // LUSCA
-    audio_play_sound_at_location(SoundId::Crash, { mapCoords.x, mapCoords.y, tileElement->GetBaseZ() });
+    if (gConfigGeneral.michael_bay_mode)
+    {
+        audio_play_sound_at_location(SoundId::Crash, { mapCoords.x, mapCoords.y, tileElement->GetBaseZ() });
 
-    sprite_misc_explosion_cloud_create(mapCoords.x, mapCoords.y, tileElement->GetBaseZ());
-    sprite_misc_explosion_flare_create(mapCoords.x, mapCoords.y, tileElement->GetBaseZ());
+        sprite_misc_explosion_cloud_create(mapCoords.x, mapCoords.y, tileElement->GetBaseZ());
+        sprite_misc_explosion_flare_create(mapCoords.x, mapCoords.y, tileElement->GetBaseZ());
+    }
 
     GameActions::Execute(&parkEntranceRemoveAction);
 }
@@ -598,11 +603,13 @@ static void viewport_interaction_remove_park_wall(TileElement* tileElement, cons
         CoordsXYZD wallLocation = { mapCoords.x, mapCoords.y, tileElement->GetBaseZ(), tileElement->GetDirection() };
         auto wallRemoveAction = WallRemoveAction(wallLocation);
 
-        // LUSCA
-        audio_play_sound_at_location(SoundId::Crash, { mapCoords.x, mapCoords.y, tileElement->GetBaseZ() });
+        if (gConfigGeneral.michael_bay_mode)
+        {
+            audio_play_sound_at_location(SoundId::Crash, { mapCoords.x, mapCoords.y, tileElement->GetBaseZ() });
 
-        sprite_misc_explosion_cloud_create(mapCoords.x, mapCoords.y, tileElement->GetBaseZ());
-        sprite_misc_explosion_flare_create(mapCoords.x, mapCoords.y, tileElement->GetBaseZ());
+            sprite_misc_explosion_cloud_create(mapCoords.x, mapCoords.y, tileElement->GetBaseZ());
+            sprite_misc_explosion_flare_create(mapCoords.x, mapCoords.y, tileElement->GetBaseZ());
+        }
         
         GameActions::Execute(&wallRemoveAction);
     }
