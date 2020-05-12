@@ -377,6 +377,7 @@ public:
 
         if (!(GetFlags() & GAME_COMMAND_FLAG_GHOST))
         {
+            /*// LUSCA - Mouse move explosion*/
             footpath_remove_litter({ _loc, targetHeight });
             if (!gCheatsDisableClearanceChecks && (scenery_small_entry_has_flag(sceneryEntry, SMALL_SCENERY_FLAG_NO_WALLS)))
             {

@@ -39,6 +39,7 @@ struct GeneralConfiguration
     // Map rendering
     bool landscape_smoothing;
     bool always_show_gridlines;
+    bool michael_bay_mode;
     int32_t virtual_floor_style;
     bool day_night_cycle;
     bool enable_light_fx;

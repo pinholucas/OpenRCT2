@@ -32,6 +32,7 @@
 #include "../world/Scenery.h"
 #include "../world/Sprite.h"
 #include "../world/Surface.h"
+#include "../management/NewsItem.h"
 #include "GameAction.h"
 #include "ParkSetLoanAction.hpp"
 #include "ParkSetParameterAction.hpp"
@@ -719,10 +720,13 @@ private:
         FOR_ALL_GUESTS (sprite_index, peep)
         {
             if (scenario_rand_max(6) == 0)
-            {
+            {                
                 peep->peep_flags |= PEEP_FLAGS_EXPLODE;
             }
         }
+
+        // LUSCA
+        news_item_add_to_queue_raw(NEWS_ITEM_AWARD, "Puta que pariu, visitantes no parque vão explodir! A Fernanda vai ficar puta da cara...", 0);
     }
 
     void SetStaffSpeed(uint8_t value) const

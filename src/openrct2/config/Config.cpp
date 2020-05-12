@@ -138,6 +138,7 @@ namespace Config
         {
             auto model = &gConfigGeneral;
             model->always_show_gridlines = reader->GetBoolean("always_show_gridlines", false);
+            model->michael_bay_mode = reader->GetBoolean("michael_bay_mode", false);
             model->autosave_frequency = reader->GetInt32("autosave", AUTOSAVE_EVERY_5MINUTES);
             model->autosave_amount = reader->GetInt32("autosave_amount", DEFAULT_NUM_AUTOSAVES_TO_KEEP);
             model->confirmation_prompt = reader->GetBoolean("confirmation_prompt", false);
@@ -220,6 +221,7 @@ namespace Config
         auto model = &gConfigGeneral;
         writer->WriteSection("general");
         writer->WriteBoolean("always_show_gridlines", model->always_show_gridlines);
+        writer->WriteBoolean("michael_bay_mode", model->michael_bay_mode);
         writer->WriteInt32("autosave", model->autosave_frequency);
         writer->WriteInt32("autosave_amount", model->autosave_amount);
         writer->WriteBoolean("confirmation_prompt", model->confirmation_prompt);

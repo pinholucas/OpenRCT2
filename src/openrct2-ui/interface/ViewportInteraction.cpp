@@ -507,6 +507,13 @@ static void viewport_interaction_remove_scenery(TileElement* tileElement, const 
         { mapCoords.x, mapCoords.y, tileElement->GetBaseZ() }, tileElement->AsSmallScenery()->GetSceneryQuadrant(),
         tileElement->AsSmallScenery()->GetEntryIndex());
 
+    // LUSCA
+    audio_play_sound_at_location(SoundId::Crash, { mapCoords.x, mapCoords.y, tileElement->GetBaseZ() });
+
+    sprite_misc_explosion_cloud_create(mapCoords.x, mapCoords.y, tileElement->GetBaseZ() );
+    sprite_misc_explosion_flare_create(mapCoords.x, mapCoords.y, tileElement->GetBaseZ() );
+
+
     GameActions::Execute(&removeSceneryAction);
 }
 
@@ -565,6 +572,13 @@ void viewport_interaction_remove_park_entrance(TileElement* tileElement, CoordsX
             break;
     }
     auto parkEntranceRemoveAction = ParkEntranceRemoveAction({ mapCoords.x, mapCoords.y, tileElement->GetBaseZ() });
+
+    // LUSCA
+    audio_play_sound_at_location(SoundId::Crash, { mapCoords.x, mapCoords.y, tileElement->GetBaseZ() });
+
+    sprite_misc_explosion_cloud_create(mapCoords.x, mapCoords.y, tileElement->GetBaseZ());
+    sprite_misc_explosion_flare_create(mapCoords.x, mapCoords.y, tileElement->GetBaseZ());
+
     GameActions::Execute(&parkEntranceRemoveAction);
 }
 
@@ -583,6 +597,13 @@ static void viewport_interaction_remove_park_wall(TileElement* tileElement, cons
     {
         CoordsXYZD wallLocation = { mapCoords.x, mapCoords.y, tileElement->GetBaseZ(), tileElement->GetDirection() };
         auto wallRemoveAction = WallRemoveAction(wallLocation);
+
+        // LUSCA
+        audio_play_sound_at_location(SoundId::Crash, { mapCoords.x, mapCoords.y, tileElement->GetBaseZ() });
+
+        sprite_misc_explosion_cloud_create(mapCoords.x, mapCoords.y, tileElement->GetBaseZ());
+        sprite_misc_explosion_flare_create(mapCoords.x, mapCoords.y, tileElement->GetBaseZ());
+        
         GameActions::Execute(&wallRemoveAction);
     }
 }
@@ -605,6 +626,13 @@ static void viewport_interaction_remove_large_scenery(TileElement* tileElement, 
         auto removeSceneryAction = LargeSceneryRemoveAction(
             { mapCoords.x, mapCoords.y, tileElement->GetBaseZ(), tileElement->GetDirection() },
             tileElement->AsLargeScenery()->GetSequenceIndex());
+
+        // LUSCA
+        audio_play_sound_at_location(SoundId::Crash, { mapCoords.x, mapCoords.y, tileElement->GetBaseZ() });
+
+        sprite_misc_explosion_cloud_create(mapCoords.x, mapCoords.y, tileElement->GetBaseZ());
+        sprite_misc_explosion_flare_create(mapCoords.x, mapCoords.y, tileElement->GetBaseZ());
+
         GameActions::Execute(&removeSceneryAction);
     }
 }

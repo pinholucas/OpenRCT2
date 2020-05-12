@@ -3925,6 +3925,8 @@ enum
     STR_PATH_TO_RCT1_DOES_NOT_CONTAIN_CSG1I_DAT = 6371,
     STR_PATH_TO_RCT1_IS_WRONG_VERSION = 6372,
 
+    STR_MICHAEL_BAY_MODE = 6373,
+    STR_MICHAEL_BAY_MODE_TIP = 6374
     // Have to include resource strings (from scenarios and objects) for the time being now that language is partially working
     /* MAX_STR_COUNT = 32768 */ // MAX_STR_COUNT - upper limit for number of strings, not the current count strings
 };

@@ -96,6 +96,7 @@ enum WINDOW_OPTIONS_WIDGET_IDX {
     WIDX_RENDERING_GROUP = WIDX_PAGE_START,
     WIDX_TILE_SMOOTHING_CHECKBOX,
     WIDX_GRIDLINES_CHECKBOX,
+    WIDX_MICHAEL_BAY_CHECKBOX,
     WIDX_UPPER_CASE_BANNERS_CHECKBOX,
     WIDX_SHOW_GUEST_PURCHASES_CHECKBOX,
     WIDX_TRANSPARENT_SCREENSHOTS_CHECKBOX,
@@ -248,17 +249,18 @@ static rct_widget window_options_display_widgets[] = {
 static rct_widget window_options_rendering_widgets[] = {
     MAIN_OPTIONS_WIDGETS,
 #define FRAME_RENDERING_START 53
-    { WWT_GROUPBOX,         1,  5,      304,    FRAME_RENDERING_START + 0,      FRAME_RENDERING_START + 107,    STR_RENDERING_GROUP,            STR_NONE },                             // Rendering group
+    { WWT_GROUPBOX,         1,  5,      304,    FRAME_RENDERING_START + 0,      FRAME_RENDERING_START + 121,    STR_RENDERING_GROUP,            STR_NONE },                             // Rendering group
     { WWT_CHECKBOX,         1,  10,     290,    FRAME_RENDERING_START + 15,     FRAME_RENDERING_START + 26,     STR_TILE_SMOOTHING,             STR_TILE_SMOOTHING_TIP },               // Landscape smoothing
     { WWT_CHECKBOX,         1,  10,     290,    FRAME_RENDERING_START + 30,     FRAME_RENDERING_START + 41,     STR_GRIDLINES,                  STR_GRIDLINES_TIP },                    // Gridlines
-    { WWT_CHECKBOX,         1,  10,     290,    FRAME_RENDERING_START + 45,     FRAME_RENDERING_START + 56,     STR_UPPERCASE_BANNERS,          STR_UPPERCASE_BANNERS_TIP },            // Uppercase banners
-    { WWT_CHECKBOX,         1,  10,     290,    FRAME_RENDERING_START + 60,     FRAME_RENDERING_START + 71,     STR_SHOW_GUEST_PURCHASES,       STR_SHOW_GUEST_PURCHASES_TIP },         // Guest purchases
-    { WWT_CHECKBOX,         1,  10,     290,    FRAME_RENDERING_START + 75,     FRAME_RENDERING_START + 86,     STR_TRANSPARENT_SCREENSHOT,     STR_TRANSPARENT_SCREENSHOT_TIP },       // Transparent screenshot
-    { WWT_LABEL,            1,  10,     290,    FRAME_RENDERING_START + 90,     FRAME_RENDERING_START + 101,    STR_VIRTUAL_FLOOR_STYLE,        STR_NONE },                             // Virtual floor
-    { WWT_DROPDOWN,         1,  155,    299,    FRAME_RENDERING_START + 90,     FRAME_RENDERING_START + 101,    STR_NONE,                       STR_VIRTUAL_FLOOR_STYLE_TIP },          // Virtual floor dropdown
-    { WWT_BUTTON,           1,  288,    298,    FRAME_RENDERING_START + 91,     FRAME_RENDERING_START + 100,    STR_DROPDOWN_GLYPH,             STR_VIRTUAL_FLOOR_STYLE_TIP },          // Virtual floor dropdown
+    { WWT_CHECKBOX,         1,  10,     290,    FRAME_RENDERING_START + 45,     FRAME_RENDERING_START + 56,     STR_MICHAEL_BAY_MODE,           STR_MICHAEL_BAY_MODE_TIP },             // Michael Bay Mode
+    { WWT_CHECKBOX,         1,  10,     290,    FRAME_RENDERING_START + 60,     FRAME_RENDERING_START + 71,     STR_UPPERCASE_BANNERS,          STR_UPPERCASE_BANNERS_TIP },            // Uppercase banners
+    { WWT_CHECKBOX,         1,  10,     290,    FRAME_RENDERING_START + 75,     FRAME_RENDERING_START + 86,     STR_SHOW_GUEST_PURCHASES,       STR_SHOW_GUEST_PURCHASES_TIP },         // Guest purchases
+    { WWT_CHECKBOX,         1,  10,     290,    FRAME_RENDERING_START + 90,     FRAME_RENDERING_START + 101,     STR_TRANSPARENT_SCREENSHOT,     STR_TRANSPARENT_SCREENSHOT_TIP },       // Transparent screenshot
+    { WWT_LABEL,            1,  10,     290,    FRAME_RENDERING_START + 105,     FRAME_RENDERING_START + 112,    STR_VIRTUAL_FLOOR_STYLE,        STR_NONE },                             // Virtual floor
+    { WWT_DROPDOWN,         1,  155,    299,    FRAME_RENDERING_START + 105,     FRAME_RENDERING_START + 116,    STR_NONE,                       STR_VIRTUAL_FLOOR_STYLE_TIP },          // Virtual floor dropdown
+    { WWT_BUTTON,           1,  288,    298,    FRAME_RENDERING_START + 106,     FRAME_RENDERING_START + 115,    STR_DROPDOWN_GLYPH,             STR_VIRTUAL_FLOOR_STYLE_TIP },          // Virtual floor dropdown
 #undef FRAME_RENDERING_START
-#define FRAME_EFFECTS_START 163
+#define FRAME_EFFECTS_START 178
     { WWT_GROUPBOX,         1,  5,      304,    FRAME_EFFECTS_START + 0,        FRAME_EFFECTS_START + 93,       STR_EFFECTS_GROUP,              STR_NONE },                             // Rendering group
     { WWT_CHECKBOX,         1,  10,     290,    FRAME_EFFECTS_START + 15,       FRAME_EFFECTS_START + 26,       STR_CYCLE_DAY_NIGHT,            STR_CYCLE_DAY_NIGHT_TIP },              // Cycle day-night
     { WWT_CHECKBOX,         1,  25,     290,    FRAME_EFFECTS_START + 30,       FRAME_EFFECTS_START + 41,       STR_ENABLE_LIGHTING_EFFECTS,    STR_ENABLE_LIGHTING_EFFECTS_TIP },      // Enable light fx
@@ -540,6 +542,7 @@ static uint64_t window_options_page_enabled_widgets[] = {
     MAIN_OPTIONS_ENABLED_WIDGETS |
     (1 << WIDX_TILE_SMOOTHING_CHECKBOX) |
     (1 << WIDX_GRIDLINES_CHECKBOX) |
+    (1 << WIDX_MICHAEL_BAY_CHECKBOX) |
     (1 << WIDX_UPPER_CASE_BANNERS_CHECKBOX) |
     (1 << WIDX_SHOW_GUEST_PURCHASES_CHECKBOX) |
     (1 << WIDX_TRANSPARENT_SCREENSHOTS_CHECKBOX) |
@@ -740,6 +743,11 @@ static void window_options_mouseup(rct_window* w, rct_widgetindex widgetIndex)
                         else
                             w->viewport->flags &= ~VIEWPORT_FLAG_GRIDLINES;
                     }
+                    break;
+                case WIDX_MICHAEL_BAY_CHECKBOX:
+                    gConfigGeneral.michael_bay_mode ^= 1;
+                    config_save_default();
+                    w->Invalidate();
                     break;
                 case WIDX_DAY_NIGHT_CHECKBOX:
                     gConfigGeneral.day_night_cycle ^= 1;
@@ -1771,6 +1779,7 @@ static void window_options_invalidate(rct_window* w)
         {
             widget_set_checkbox_value(w, WIDX_TILE_SMOOTHING_CHECKBOX, gConfigGeneral.landscape_smoothing);
             widget_set_checkbox_value(w, WIDX_GRIDLINES_CHECKBOX, gConfigGeneral.always_show_gridlines);
+            widget_set_checkbox_value(w, WIDX_MICHAEL_BAY_CHECKBOX, gConfigGeneral.michael_bay_mode);
             widget_set_checkbox_value(w, WIDX_DAY_NIGHT_CHECKBOX, gConfigGeneral.day_night_cycle);
             widget_set_checkbox_value(w, WIDX_SHOW_GUEST_PURCHASES_CHECKBOX, gConfigGeneral.show_guest_purchases);
             widget_set_checkbox_value(w, WIDX_TRANSPARENT_SCREENSHOTS_CHECKBOX, gConfigGeneral.transparent_screenshot);

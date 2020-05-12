@@ -319,6 +319,13 @@ private:
 
                 auto removRes = GameActions::ExecuteNested(&trackRemoveAction);
 
+                // LUSCA
+                audio_play_sound_at_location(SoundId::Crash, { location.x, location.y, location.z });
+
+                sprite_misc_explosion_cloud_create(location.x, location.y, location.z);
+                sprite_misc_explosion_flare_create(location.x, location.y, location.z);
+                // END
+
                 if (removRes->Error != GA_ERROR::OK)
                 {
                     tile_element_remove(it.element);

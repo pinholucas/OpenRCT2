@@ -9,6 +9,7 @@
 
 #pragma once
 
+#include "../config/Config.h"
 #include "../Context.h"
 #include "../core/MemoryStream.h"
 #include "../drawing/Drawing.h"
@@ -178,8 +179,25 @@ private:
                                 tileElement->AsSmallScenery()->GetEntryIndex());
                             removeSceneryAction.SetFlags(GetFlags());
 
-                            auto res = executing ? GameActions::ExecuteNested(&removeSceneryAction)
-                                                 : GameActions::QueryNested(&removeSceneryAction);
+                            GameActionResult::Ptr res = GameActionResult::Ptr();
+
+                            if (executing)
+                            {
+                                if (gConfigGeneral.michael_bay_mode)
+                                {
+                                    // LUSCA
+                                    audio_play_sound_at_location(SoundId::Crash, { tilePos.x, tilePos.y, tileElement->GetBaseZ()});
+
+                                    sprite_misc_explosion_cloud_create(tilePos.x, tilePos.y, tileElement->GetBaseZ());
+                                    sprite_misc_explosion_flare_create(tilePos.x, tilePos.y, tileElement->GetBaseZ());
+                                }
+
+                                res = GameActions::ExecuteNested(&removeSceneryAction);
+                            }
+                            else
+                            {
+                                res = GameActions::QueryNested(&removeSceneryAction);
+                            }
 
                             if (res->Error == GA_ERROR::OK)
                             {
@@ -195,8 +213,25 @@ private:
                             auto wallRemoveAction = WallRemoveAction(wallLocation);
                             wallRemoveAction.SetFlags(GetFlags());
 
-                            auto res = executing ? GameActions::ExecuteNested(&wallRemoveAction)
-                                                 : GameActions::QueryNested(&wallRemoveAction);
+                            GameActionResult::Ptr res = GameActionResult::Ptr();
+
+                            if (executing)
+                            {
+                                if (gConfigGeneral.michael_bay_mode)
+                                {
+                                    // LUSCA
+                                    audio_play_sound_at_location(SoundId::Crash, { tilePos.x, tilePos.y, tileElement->GetBaseZ()});
+
+                                    sprite_misc_explosion_cloud_create(tilePos.x, tilePos.y, tileElement->GetBaseZ());
+                                    sprite_misc_explosion_flare_create(tilePos.x, tilePos.y, tileElement->GetBaseZ());
+                                }                                
+
+                                res = GameActions::ExecuteNested(&wallRemoveAction);
+                            }
+                            else
+                            {
+                                res = GameActions::QueryNested(&wallRemoveAction);
+                            }
 
                             if (res->Error == GA_ERROR::OK)
                             {
@@ -213,8 +248,25 @@ private:
                                 tileElement->AsLargeScenery()->GetSequenceIndex());
                             removeSceneryAction.SetFlags(GetFlags() | GAME_COMMAND_FLAG_PATH_SCENERY);
 
-                            auto res = executing ? GameActions::ExecuteNested(&removeSceneryAction)
-                                                 : GameActions::QueryNested(&removeSceneryAction);
+                            GameActionResult::Ptr res = GameActionResult::Ptr();
+
+                            if (executing)
+                            {
+                                if (gConfigGeneral.michael_bay_mode)
+                                {
+                                    // LUSCA
+                                    audio_play_sound_at_location(SoundId::Crash, { tilePos.x, tilePos.y, tileElement->GetBaseZ()});
+
+                                    sprite_misc_explosion_cloud_create(tilePos.x, tilePos.y, tileElement->GetBaseZ());
+                                    sprite_misc_explosion_flare_create(tilePos.x, tilePos.y, tileElement->GetBaseZ());
+                                }
+
+                                res = GameActions::ExecuteNested(&removeSceneryAction);
+                            }
+                            else
+                            {
+                                res = GameActions::QueryNested(&removeSceneryAction);
+                            }
 
                             if (res->Error == GA_ERROR::OK)
                             {
