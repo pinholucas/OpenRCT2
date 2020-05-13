@@ -353,21 +353,21 @@ money32 Ride::CalculateIncomePerHour() const
     money32 customersPerHour = ride_customers_per_hour(this);
     money32 priceMinusCost = ride_get_price(this);
 
-    int32_t currentShopItem = entry->shop_item;
+    int32_t currentShopItem = entry->shop_item[0];
     if (currentShopItem != SHOP_ITEM_NONE)
     {
         priceMinusCost -= ShopItems[currentShopItem].Cost;
     }
 
     currentShopItem = (lifecycle_flags & RIDE_LIFECYCLE_ON_RIDE_PHOTO) ? RideTypeDescriptors[type].PhotoItem
-                                                                       : entry->shop_item_secondary;
+                                                                       : entry->shop_item[1];
 
     if (currentShopItem != SHOP_ITEM_NONE)
     {
-        priceMinusCost += price_secondary;
+        priceMinusCost += price[1];
         priceMinusCost -= ShopItems[currentShopItem].Cost;
 
-        if (entry->shop_item != SHOP_ITEM_NONE)
+        if (entry->shop_item[0] != SHOP_ITEM_NONE)
             priceMinusCost /= 2;
     }
 
@@ -1049,8 +1049,8 @@ void ride_remove_peeps(Ride* ride)
         {
             auto direction = direction_reverse(location.direction);
             exitPosition = location;
-            exitPosition.x += (DirectionOffsets[direction].x * 20) + (COORDS_XY_STEP / 2);
-            exitPosition.y += (DirectionOffsets[direction].y * 20) + (COORDS_XY_STEP / 2);
+            exitPosition.x += (DirectionOffsets[direction].x * 20) + COORDS_XY_HALF_TILE;
+            exitPosition.y += (DirectionOffsets[direction].y * 20) + COORDS_XY_HALF_TILE;
             exitPosition.z += 2;
 
             // Reverse direction
@@ -1075,23 +1075,20 @@ void ride_remove_peeps(Ride* ride)
             if (peep->state == PEEP_STATE_QUEUING_FRONT && peep->sub_state == PEEP_RIDE_AT_ENTRANCE)
                 peep->RemoveFromQueue();
 
-            peep->Invalidate();
-
             if (exitPosition.direction == INVALID_DIRECTION)
             {
                 CoordsXYZ newLoc = { peep->NextLoc.ToTileCentre(), peep->NextLoc.z };
                 if (peep->GetNextIsSloped())
                     newLoc.z += COORDS_Z_STEP;
                 newLoc.z++;
-                sprite_move(newLoc.x, newLoc.y, newLoc.z, peep);
+                peep->MoveTo(newLoc);
             }
             else
             {
-                sprite_move(exitPosition.x, exitPosition.y, exitPosition.z, peep);
+                peep->MoveTo(exitPosition);
                 peep->sprite_direction = exitPosition.direction;
             }
 
-            peep->Invalidate();
             peep->state = PEEP_STATE_FALLING;
             peep->SwitchToSpecialSprite(0);
 
@@ -4382,7 +4379,7 @@ static Vehicle* vehicle_create_car(
             chosenLoc.x = x + (scenario_rand() & 0xFF);
         } while (vehicle->DodgemsCarWouldCollideAt(chosenLoc, nullptr));
 
-        sprite_move(chosenLoc.x, chosenLoc.y, z, vehicle);
+        vehicle->MoveTo({ chosenLoc.x, chosenLoc.y, z });
     }
     else
     {
@@ -4457,7 +4454,7 @@ static Vehicle* vehicle_create_car(
         z = tileElement->GetBaseZ();
         z += RideData5[ride->type].z_offset;
 
-        sprite_move(x, y, z, vehicle);
+        vehicle->MoveTo({ x, y, z });
         vehicle->track_type = (tileElement->AsTrack()->GetTrackType() << 2) | (vehicle->sprite_direction >> 3);
         vehicle->track_progress = 31;
         if (vehicleEntry->flags & VEHICLE_ENTRY_FLAG_MINI_GOLF)
@@ -5571,7 +5568,7 @@ money32 ride_get_common_price(Ride* forRide)
     {
         if (ride.type == forRide->type && &ride != forRide)
         {
-            return ride.price;
+            return ride.price[0];
         }
     }
 
@@ -7175,7 +7172,7 @@ money16 ride_get_price(const Ride* ride)
             return 0;
         }
     }
-    return ride->price;
+    return ride->price[0];
 }
 
 /**

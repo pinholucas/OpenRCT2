@@ -2963,7 +2963,6 @@ static bool ride_station_can_depart_synchronised(ride_id_t curRideId, StationInd
                         return false;
                     }
                     ride_id_t someRideIndex = _synchronisedVehicles[0].ride_id;
-                    // uint8_t currentStation = _synchronisedVehicles[0].station_id
                     if (someRideIndex != curRideId)
                     {
                         // Sync condition: the first station to sync is a different ride
@@ -3629,7 +3628,7 @@ void Vehicle::UpdateCollisionSetup()
         train->sprite_height_negative = 45;
         train->sprite_height_positive = 5;
 
-        sprite_move(train->x, train->y, train->z, train);
+        train->MoveTo({ train->x, train->y, train->z });
         invalidate_sprite_2(train);
 
         train->var_4E = 0;
@@ -4522,13 +4521,13 @@ void Vehicle::UpdateMotionBoatHire()
 
                     if (!(curRide->boat_hire_return_direction & 1))
                     {
-                        uint16_t bp = curY & 0x1F;
-                        if (bp == 16)
+                        uint16_t tilePart = curY % COORDS_XY_STEP;
+                        if (tilePart == COORDS_XY_HALF_TILE)
                         {
                             TryReconnectBoatToTrack({ curX, curY }, flooredLocation);
                             break;
                         }
-                        if (bp <= 16)
+                        if (tilePart <= COORDS_XY_HALF_TILE)
                         {
                             curX = unk_F64E20.x;
                             curY = unk_F64E20.y + 1;
@@ -4542,13 +4541,13 @@ void Vehicle::UpdateMotionBoatHire()
                     else
                     {
                         // loc_6DA9A2:
-                        uint16_t bp = curX & 0x1F;
-                        if (bp == 16)
+                        uint16_t tilePart = curX % COORDS_XY_STEP;
+                        if (tilePart == COORDS_XY_HALF_TILE)
                         {
                             TryReconnectBoatToTrack({ curX, curY }, flooredLocation);
                             break;
                         }
-                        if (bp <= 16)
+                        if (tilePart <= COORDS_XY_HALF_TILE)
                         {
                             curX = unk_F64E20.x + 1;
                             curY = unk_F64E20.y;
@@ -4582,7 +4581,7 @@ void Vehicle::UpdateMotionBoatHire()
             _vehicleUnkF64E10++;
         }
 
-        sprite_move(unk_F64E20.x, unk_F64E20.y, unk_F64E20.z, this);
+        MoveTo(unk_F64E20);
         Invalidate();
     }
 
@@ -5353,7 +5352,7 @@ void Vehicle::CrashOnLand()
     sprite_height_negative = 45;
     sprite_height_positive = 5;
 
-    sprite_move(x, y, z, this);
+    MoveTo({ x, y, z });
     Invalidate();
 
     crash_z = 0;
@@ -5417,7 +5416,7 @@ void Vehicle::CrashOnWater()
     sprite_height_negative = 45;
     sprite_height_positive = 5;
 
-    sprite_move(x, y, z, this);
+    MoveTo({ x, y, z });
     Invalidate();
 
     crash_z = -1;
@@ -5503,7 +5502,7 @@ void Vehicle::UpdateCrash()
             continue;
         }
 
-        sprite_move(curPosition.x, curPosition.y, curPosition.z, curVehicle);
+        curVehicle->MoveTo(curPosition);
         invalidate_sprite_2(curVehicle);
 
         if (curVehicle->sub_state == 1)
@@ -6367,7 +6366,7 @@ int32_t Vehicle::UpdateMotionDodgems()
         if (!DodgemsCarWouldCollideAt(location, &collideSprite))
         {
             Invalidate();
-            sprite_move(location.x, location.y, location.z, this);
+            MoveTo(location);
             Invalidate();
         }
     }
@@ -6435,7 +6434,7 @@ int32_t Vehicle::UpdateMotionDodgems()
             }
         }
 
-        sprite_move(unk_F64E20.x, unk_F64E20.y, unk_F64E20.z, this);
+        MoveTo(unk_F64E20);
         Invalidate();
     }
 
@@ -6621,7 +6620,7 @@ void Vehicle::UpdateTrackMotionUpStopCheck() const
  * merely as a velocity regulator, in a closed state. When the brake is open, it
  * boosts the train to the speed limit
  */
-static void apply_non_stop_block_brake(Vehicle* vehicle, bool slowDownToBlockBrakeSpeed)
+static void apply_non_stop_block_brake(Vehicle* vehicle)
 {
     if (vehicle->velocity >= 0)
     {
@@ -6632,7 +6631,7 @@ static void apply_non_stop_block_brake(Vehicle* vehicle, bool slowDownToBlockBra
             vehicle->velocity = BLOCK_BRAKE_BASE_SPEED;
             vehicle->acceleration = 0;
         }
-        else if (slowDownToBlockBrakeSpeed)
+        else
         {
             // Slow it down till the fixed block brake speed
             vehicle->velocity -= vehicle->velocity >> 4;
@@ -6665,11 +6664,7 @@ static void apply_block_brakes(Vehicle* vehicle, bool is_block_brake_closed)
     }
     else
     {
-#ifdef NEW_BLOCK_BRAKES
-        apply_non_stop_block_brake(vehicle, false);
-#else
-        apply_non_stop_block_brake(vehicle, true);
-#endif
+        apply_non_stop_block_brake(vehicle);
     }
 }
 
@@ -6709,7 +6704,7 @@ void Vehicle::CheckAndApplyBlockSectionStopSite()
             if (curRide->IsBlockSectioned())
                 apply_block_brakes(this, trackElement->AsTrack()->BlockBrakeClosed());
             else
-                apply_non_stop_block_brake(this, true);
+                apply_non_stop_block_brake(this);
 
             break;
         case TRACK_ELEM_END_STATION:
@@ -7271,7 +7266,7 @@ static void steam_particle_create(int16_t x, int16_t y, int16_t z)
         steam->type = SPRITE_MISC_STEAM_PARTICLE;
         steam->frame = 256;
         steam->time_to_move = 0;
-        sprite_move(x, y, z, steam);
+        steam->MoveTo({ x, y, z });
     }
 }
 
@@ -7654,7 +7649,7 @@ void Vehicle::UpdateHandleWaterSplash() const
 void Vehicle::UpdateReverserCarBogies()
 {
     const auto moveInfo = vehicle_get_move_info(TrackSubposition, track_type, track_progress);
-    sprite_move(TrackLocation.x + moveInfo->x, TrackLocation.y + moveInfo->y, z, this);
+    MoveTo({ TrackLocation.x + moveInfo->x, TrackLocation.y + moveInfo->y, z });
 }
 
 /**
@@ -9256,7 +9251,7 @@ loc_6DCD6B:
     goto loc_6DC99A;
 
 loc_6DCDE4:
-    sprite_move(unk_F64E20.x, unk_F64E20.y, unk_F64E20.z, vehicle);
+    vehicle->MoveTo(unk_F64E20);
     vehicle->Invalidate();
 
 loc_6DCE02:
@@ -9691,7 +9686,7 @@ int32_t Vehicle::UpdateTrackMotion(int32_t* outStation)
             }
         }
         // loc_6DBF20
-        sprite_move(unk_F64E20.x, unk_F64E20.y, unk_F64E20.z, car);
+        car->MoveTo(unk_F64E20);
         invalidate_sprite_2(car);
 
     loc_6DBF3E:

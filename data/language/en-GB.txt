@@ -2950,7 +2950,6 @@ STR_5595    :Ride has crashed
 STR_5596    :Ride warnings
 STR_5597    :Ride / scenery researched
 STR_5598    :Guest warnings
-STR_5599    :Guest is lost
 STR_5600    :Guest has left the park
 STR_5601    :Guest is queuing for ride
 STR_5602    :Guest is on ride
@@ -3683,8 +3682,8 @@ STR_6366    :Stuck or stalled vehicles
 STR_6367    :{WINDOW_COLOUR_2}Animation frame:
 STR_6368    :For compatibility reasons, it is not recommended to run OpenRCT2 with Wine. OpenRCT2 has native support for macOS, Linux, FreeBSD and OpenBSD.
 STR_6369    :Allow building track at invalid heights
-STR_6370    :{SMALLFONT}{BLACK}Allows placing track pieces at any height interval 
-STR_6371    :The specified path contains a RollerCoaster Tycoon 1 installation, but the “csg1i.dat” file is missing. This file needs to be copied from the RollerCoaster Tycoon 1 CD to the “Data” folder of the RollerCoaster Tycoon 1 install on your hard drive. 
+STR_6370    :{SMALLFONT}{BLACK}Allows placing track pieces at any height interval
+STR_6371    :The specified path contains a RollerCoaster Tycoon 1 installation, but the “csg1i.dat” file is missing. This file needs to be copied from the RollerCoaster Tycoon 1 CD to the “Data” folder of the RollerCoaster Tycoon 1 install on your hard drive.
 STR_6372    :The specified path contains a RollerCoaster Tycoon 1 installation, but this version is not suitable. OpenRCT2 needs a Loopy Landscapes or RCT Deluxe install in order to use RollerCoaster Tycoon 1 assets.
 
 #############

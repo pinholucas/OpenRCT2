@@ -53,21 +53,37 @@ namespace OpenRCT2::Scripting
 
         int32_t x_get() const
         {
-            return GetWindow()->windowPos.x;
+            auto w = GetWindow();
+            if (w != nullptr)
+            {
+                return w->windowPos.x;
+            }
+            return 0;
         }
         void x_set(int32_t value)
         {
             auto w = GetWindow();
-            window_set_position(w, { value, w->windowPos.y });
+            if (w != nullptr)
+            {
+                window_set_position(w, { value, w->windowPos.y });
+            }
         }
         int32_t y_get() const
         {
-            return GetWindow()->windowPos.y;
+            auto w = GetWindow();
+            if (w != nullptr)
+            {
+                return w->windowPos.y;
+            }
+            return 0;
         }
         void y_set(int32_t value)
         {
             auto w = GetWindow();
-            window_set_position(w, { w->windowPos.x, value });
+            if (w != nullptr)
+            {
+                window_set_position(w, { w->windowPos.x, value });
+            }
         }
         int32_t width_get() const
         {
@@ -177,16 +193,18 @@ namespace OpenRCT2::Scripting
             return (flags & (WF_STICK_TO_BACK | WF_STICK_TO_FRONT)) != 0;
         }
 
-        std::vector<std::shared_ptr<ScWidget>> widgets_get() const
+        std::vector<DukValue> widgets_get() const
         {
-            std::vector<std::shared_ptr<ScWidget>> result;
+            auto ctx = GetContext()->GetScriptEngine().GetContext();
+
+            std::vector<DukValue> result;
             auto w = GetWindow();
             if (w != nullptr)
             {
                 rct_widgetindex widgetIndex = 0;
                 for (auto widget = w->widgets; widget->type != WWT_LAST; widget++)
                 {
-                    result.push_back(std::make_shared<ScWidget>(_class, _number, widgetIndex));
+                    result.push_back(ScWidget::ToDukValue(ctx, w, widgetIndex));
                     widgetIndex++;
                 }
             }
@@ -257,18 +275,19 @@ namespace OpenRCT2::Scripting
             }
         }
 
-        std::shared_ptr<ScWidget> findWidget(std::string name) const
+        DukValue findWidget(std::string name) const
         {
+            auto ctx = GetContext()->GetScriptEngine().GetContext();
             auto w = GetWindow();
             if (w != nullptr)
             {
                 auto widgetIndex = FindWidgetIndexByName(w, name);
                 if (widgetIndex)
                 {
-                    return std::make_shared<ScWidget>(_class, _number, *widgetIndex);
+                    return ScWidget::ToDukValue(ctx, w, *widgetIndex);
                 }
             }
-            return {};
+            return GetObjectAsDukValue<ScWidget>(ctx, nullptr);
         }
 
         void bringToFront()

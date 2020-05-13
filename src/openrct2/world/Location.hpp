@@ -13,9 +13,10 @@
 
 #include <algorithm>
 
-#define LOCATION_NULL ((int16_t)(uint16_t)0x8000)
+constexpr const int16_t LOCATION_NULL = -32768;
 
 constexpr const int32_t COORDS_XY_STEP = 32;
+constexpr const int32_t COORDS_XY_HALF_TILE = (COORDS_XY_STEP / 2);
 constexpr const int32_t COORDS_Z_STEP = 8;
 constexpr const int32_t COORDS_Z_PER_TINY_Z = 16;
 
@@ -80,6 +81,29 @@ struct ScreenCoordsXY
     }
 
     bool operator!=(const ScreenCoordsXY& other) const
+    {
+        return !(*this == other);
+    }
+};
+
+struct ScreenSize
+{
+    int32_t width{};
+    int32_t height{};
+
+    ScreenSize() = default;
+    constexpr ScreenSize(int32_t _width, int32_t _height)
+        : width(_width)
+        , height(_height)
+    {
+    }
+
+    bool operator==(const ScreenSize& other) const
+    {
+        return width == other.width && height == other.height;
+    }
+
+    bool operator!=(const ScreenSize& other) const
     {
         return !(*this == other);
     }
@@ -174,7 +198,7 @@ struct CoordsXY
 
     CoordsXY ToTileCentre() const
     {
-        return ToTileStart() + CoordsXY{ (COORDS_XY_STEP / 2), (COORDS_XY_STEP / 2) };
+        return ToTileStart() + CoordsXY{ COORDS_XY_HALF_TILE, COORDS_XY_HALF_TILE };
     }
 
     CoordsXY ToTileStart() const
@@ -254,6 +278,13 @@ struct TileCoordsXY
 
     CoordsXY ToCoordsXY() const
     {
+        if (isNull())
+        {
+            CoordsXY ret{};
+            ret.setNull();
+            return ret;
+        }
+
         return { x * COORDS_XY_STEP, y * COORDS_XY_STEP };
     }
 
@@ -345,7 +376,7 @@ struct CoordsXYZ : public CoordsXY
 
     CoordsXYZ ToTileCentre() const
     {
-        return ToTileStart() + CoordsXYZ{ (COORDS_XY_STEP / 2), (COORDS_XY_STEP / 2), 0 };
+        return ToTileStart() + CoordsXYZ{ COORDS_XY_HALF_TILE, COORDS_XY_HALF_TILE, 0 };
     }
 };
 
@@ -404,6 +435,12 @@ struct TileCoordsXYZ : public TileCoordsXY
 
     CoordsXYZ ToCoordsXYZ() const
     {
+        if (isNull())
+        {
+            CoordsXYZ ret{};
+            ret.setNull();
+            return ret;
+        }
         return { x * COORDS_XY_STEP, y * COORDS_XY_STEP, z * COORDS_Z_STEP };
     }
 };
@@ -521,7 +558,7 @@ struct CoordsXYZD : public CoordsXYZ
 
     CoordsXYZD ToTileCentre() const
     {
-        return ToTileStart() + CoordsXYZD{ (COORDS_XY_STEP / 2), (COORDS_XY_STEP / 2), 0, 0 };
+        return ToTileStart() + CoordsXYZD{ COORDS_XY_HALF_TILE, COORDS_XY_HALF_TILE, 0, 0 };
     }
 };
 
@@ -562,6 +599,12 @@ struct TileCoordsXYZD : public TileCoordsXYZ
 
     CoordsXYZD ToCoordsXYZD() const
     {
+        if (isNull())
+        {
+            CoordsXYZD ret{};
+            ret.setNull();
+            return ret;
+        }
         return { x * COORDS_XY_STEP, y * COORDS_XY_STEP, z * COORDS_Z_STEP, direction };
     }
 };

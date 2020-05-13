@@ -71,7 +71,6 @@ uint8_t gPeepWarningThrottle[16];
 TileCoordsXYZ gPeepPathFindGoalPosition;
 bool gPeepPathFindIgnoreForeignQueues;
 ride_id_t gPeepPathFindQueueRideIndex;
-// uint32_t gPeepPathFindAltStationNum;
 
 static uint8_t _unk_F1AEF0;
 static TileElement* _peepRideEntranceExitElement;
@@ -354,10 +353,10 @@ void Peep::Invalidate()
     invalidate_sprite_2(this);
 }
 
-void Peep::MoveTo(int16_t destX, int16_t destY, int16_t destZ)
+void Peep::MoveTo(const CoordsXYZ& newLocation)
 {
     Invalidate(); // Invalidate current position.
-    sprite_move(destX, destY, destZ, this);
+    SpriteBase::MoveTo(newLocation);
     Invalidate(); // Invalidate new position.
 }
 
@@ -740,7 +739,7 @@ void Peep::Pickup()
     {
         guest->RemoveFromRide();
     }
-    MoveTo(LOCATION_NULL, y, z);
+    MoveTo({ LOCATION_NULL, y, z });
     SetState(PEEP_STATE_PICKED);
     sub_state = 0;
 }
@@ -750,7 +749,7 @@ void Peep::PickupAbort(int32_t old_x)
     if (state != PEEP_STATE_PICKED)
         return;
 
-    MoveTo(old_x, y, z + 8);
+    MoveTo({ old_x, y, z + 8 });
 
     if (x != LOCATION_NULL)
     {
@@ -802,7 +801,7 @@ bool Peep::Place(const TileCoordsXYZ& location, bool apply)
 
     if (apply)
     {
-        MoveTo(destination.x, destination.y, destination.z);
+        MoveTo(destination);
         SetState(PEEP_STATE_FALLING);
         action = PEEP_ACTION_NONE_2;
         special_sprite = 0;
@@ -939,7 +938,7 @@ void Peep::UpdateFalling()
                     if (height - 4 >= z && height < z + 20)
                     {
                         // Looks like we are drowning!
-                        MoveTo(x, y, height);
+                        MoveTo({ x, y, height });
 
                         auto guest = AsGuest();
                         if (guest != nullptr)
@@ -979,11 +978,11 @@ void Peep::UpdateFalling()
             Remove();
             return;
         }
-        MoveTo(x, y, z - 2);
+        MoveTo({ x, y, z - 2 });
         return;
     }
 
-    MoveTo(x, y, saved_height);
+    MoveTo({ x, y, saved_height });
 
     NextLoc = { CoordsXY{ x, y }.ToTileStart(), saved_map->GetBaseZ() };
 
@@ -1643,7 +1642,7 @@ Peep* Peep::Generate(const CoordsXYZ& coords)
     peep->sprite_height_negative = spriteBounds[peep->action_sprite_type].sprite_height_negative;
     peep->sprite_height_positive = spriteBounds[peep->action_sprite_type].sprite_height_positive;
 
-    peep->MoveTo(coords.x, coords.y, coords.z);
+    peep->MoveTo(coords);
     peep->sprite_direction = 0;
     peep->mass = (scenario_rand() & 0x1F) + 45;
     peep->path_check_optimisation = 0;
@@ -2498,7 +2497,7 @@ static void peep_interact_with_entrance(Peep* peep, int16_t x, int16_t y, TileEl
             peep->destination_x += CoordsDirectionDelta[peep->direction].x;
             peep->destination_y += CoordsDirectionDelta[peep->direction].y;
             peep->destination_tolerance = 9;
-            peep->MoveTo(x, y, peep->z);
+            peep->MoveTo({ x, y, peep->z });
             peep->SetState(PEEP_STATE_LEAVING_PARK);
 
             peep->var_37 = 0;
@@ -2639,7 +2638,7 @@ static void peep_interact_with_entrance(Peep* peep, int16_t x, int16_t y, TileEl
         peep->destination_x += CoordsDirectionDelta[peep->direction].x;
         peep->destination_y += CoordsDirectionDelta[peep->direction].y;
         peep->destination_tolerance = 7;
-        peep->MoveTo(x, y, peep->z);
+        peep->MoveTo({ x, y, peep->z });
     }
 }
 
@@ -2656,7 +2655,7 @@ static void peep_footpath_move_forward(Peep* peep, int16_t x, int16_t y, TileEle
 
     if (peep->type == PEEP_TYPE_STAFF)
     {
-        peep->MoveTo(x, y, z);
+        peep->MoveTo({ x, y, z });
         return;
     }
 
@@ -2780,7 +2779,7 @@ static void peep_footpath_move_forward(Peep* peep, int16_t x, int16_t y, TileEle
         }
     }
 
-    peep->MoveTo(x, y, z);
+    peep->MoveTo({ x, y, z });
 }
 
 /**
@@ -2959,7 +2958,7 @@ static bool peep_interact_with_shop(Peep* peep, int16_t x, int16_t y, TileElemen
             return true;
         }
 
-        money16 cost = ride->price;
+        money16 cost = ride->price[0];
         if (cost != 0 && !(gParkFlags & PARK_FLAGS_NO_MONEY))
         {
             ride->total_profit += cost;
@@ -3085,11 +3084,11 @@ void Peep::PerformNextAction(uint8_t& pathing_result, TileElement*& tile_result)
     if (truncatedNewLoc == CoordsXY{ NextLoc })
     {
         int16_t height = GetZOnSlope(newLoc.x, newLoc.y);
-        MoveTo(newLoc.x, newLoc.y, height);
+        MoveTo({ newLoc.x, newLoc.y, height });
         return;
     }
 
-    if (newLoc.x < 32 || newLoc.y < 32 || newLoc.x >= gMapSizeUnits || newLoc.y >= gMapSizeUnits)
+    if (map_is_edge(newLoc))
     {
         if (outside_of_park == 1)
         {
@@ -3183,7 +3182,7 @@ void Peep::PerformNextAction(uint8_t& pathing_result, TileElement*& tile_result)
             SetNextFlags(0, false, true);
 
             height = GetZOnSlope(newLoc.x, newLoc.y);
-            MoveTo(newLoc.x, newLoc.y, height);
+            MoveTo({ newLoc.x, newLoc.y, height });
             return;
         }
     }

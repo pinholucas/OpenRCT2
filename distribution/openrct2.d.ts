@@ -35,7 +35,7 @@ declare global {
     var network: Network;
     /** APIs for the park and management of it. */
     var park: Park;
-    /** 
+    /**
      * APIs for controlling the user interface.
      * These will only be available to servers and clients that are not running headless mode.
      * Plugin writers should check if ui is available using `typeof ui !== 'undefined'`.
@@ -114,7 +114,7 @@ declare global {
          * Executes a command using the legacy console REPL. This should not be used
          * by plugins, and exists only for servers to continue using old commands until
          * all functionality can be accomplished with this scripting API.
-         * 
+         *
          * @deprecated
          * @param command The command and arguments to execute.
          */
@@ -213,6 +213,7 @@ declare global {
         subscribe(hook: "network.authenticate", callback: (e: NetworkAuthenticateEventArgs) => void): IDisposable;
         subscribe(hook: "network.join", callback: (e: NetworkEventArgs) => void): IDisposable;
         subscribe(hook: "network.leave", callback: (e: NetworkEventArgs) => void): IDisposable;
+        subscribe(hook: "ride.ratings.calculate", callback: (e: RideRatingsCalculateArgs) => void): IDisposable;
     }
 
     interface Configuration {
@@ -277,7 +278,8 @@ declare global {
 
     type HookType =
         "interval.tick" | "interval.day" |
-        "network.chat" | "network.action" | "network.join" | "network.leave";
+        "network.chat" | "network.action" | "network.join" | "network.leave" |
+        "ride.ratings.calculate";
 
     type ExpenditureType =
         "ride_construction" |
@@ -331,6 +333,13 @@ declare global {
         cancel: boolean;
     }
 
+    interface RideRatingsCalculateArgs {
+        readonly rideId: number;
+        excitement: number;
+        intensity: number;
+        nausea: number;
+    }
+
     /**
      * APIs for the in-game date.
      */
@@ -376,7 +385,8 @@ declare global {
         getRide(id: number): Ride;
         getTile(x: number, y: number): Tile;
         getEntity(id: number): Entity;
-        getAllEntities(type: EntityType);
+        getAllEntities(type: EntityType): Entity[];
+        getAllEntities(type: "peep"): Peep[];
     }
 
     type TileElementType =
@@ -1071,7 +1081,7 @@ declare global {
      * Represents the type of a widget, e.g. button or label.
      */
     type WidgetType =
-        "button" | "checkbox" | "dropdown" | "groupbox" | "label" | "spinner" | "viewport";
+        "button" | "checkbox" | "dropdown" | "groupbox" | "label" | "listview" | "spinner" | "viewport";
 
     interface Widget {
         type: WidgetType;
@@ -1110,6 +1120,42 @@ declare global {
     interface LabelWidget extends Widget {
         text: string;
         onChange: (index: number) => void;
+    }
+
+    type SortOrder = "none" | "ascending" | "descending";
+
+    type ScrollbarType = "none" | "horizontal" | "vertical" | "both";
+
+    interface ListViewColumn {
+        canSort?: boolean;
+        sortOrder?: SortOrder;
+        header?: string;
+        headerTooltip?: string;
+        width?: number;
+        ratioWidth?: number;
+        minWidth?: number;
+        maxWidth?: number;
+    }
+
+    type ListViewItem = string[];
+
+    interface RowColumn {
+        row: number;
+        column: number;
+    }
+
+    interface ListView extends Widget {
+        scrollbars?: ScrollbarType;
+        isStriped?: boolean;
+        showColumnHeaders?: boolean;
+        columns?: ListViewColumn[];
+        items?: string[] | ListViewItem[];
+        selectedCell?: RowColumn;
+        readonly highlightedCell?: RowColumn;
+        canSelect?: boolean;
+
+        onHighlight: (item: number, column: number) => void;
+        onClick: (item: number, column: number) => void;
     }
 
     interface SpinnerWidget extends Widget {
