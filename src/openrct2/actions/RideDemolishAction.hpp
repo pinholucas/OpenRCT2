@@ -322,7 +322,7 @@ private:
 
                 if (gConfigGeneral.michael_bay_mode)
                 {
-                    audio_play_sound_at_location(SoundId::Crash, { location.x, location.y, location.z });
+                    audio_play_sound_at_location(SoundId::Crash, {location.x, location.y, location.z});
 
                     sprite_misc_explosion_cloud_create(location.x, location.y, location.z);
                     sprite_misc_explosion_flare_create(location.x, location.y, location.z);

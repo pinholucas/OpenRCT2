@@ -10,6 +10,7 @@
 #pragma once
 
 #include "../Cheats.h"
+#include "../config/Config.h"
 #include "../OpenRCT2.h"
 #include "../core/MemoryStream.h"
 #include "../interface/Window.h"
@@ -85,6 +86,14 @@ public:
         res->Position.x = _loc.x + 16;
         res->Position.y = _loc.y + 16;
         res->Position.z = tile_element_height(res->Position);
+
+        if (gConfigGeneral.michael_bay_mode)
+        {
+            audio_play_sound_at_location(SoundId::Crash, {res->Position.x, res->Position.y, res->Position.z});
+
+            sprite_misc_explosion_cloud_create(res->Position.x, res->Position.y, res->Position.z);
+            sprite_misc_explosion_flare_create(res->Position.x, res->Position.y, res->Position.z);
+        }
 
         tile_element_remove_banner_entry(wallElement);
         map_invalidate_tile_zoom1({ _loc, wallElement->GetBaseZ(), (wallElement->GetBaseZ()) + 72 });

@@ -10,6 +10,7 @@
 #pragma once
 
 #include "../Cheats.h"
+#include "../config/Config.h"
 #include "../OpenRCT2.h"
 #include "../common.h"
 #include "../core/MemoryStream.h"
@@ -184,6 +185,14 @@ public:
                     // If we are removing ghost elements
                     if ((flags & GAME_COMMAND_FLAG_GHOST) && sceneryElement->IsGhost() == false)
                         continue;
+
+                    if (gConfigGeneral.michael_bay_mode)
+                    {
+                        audio_play_sound_at_location(SoundId::Crash, {res->Position.x, res->Position.y, res->Position.z});
+
+                        sprite_misc_explosion_cloud_create(res->Position.x, res->Position.y, res->Position.z);
+                        sprite_misc_explosion_flare_create(res->Position.x, res->Position.y, res->Position.z);
+                    }  
 
                     map_invalidate_tile_full(currentTile);
                     tile_element_remove(sceneryElement);

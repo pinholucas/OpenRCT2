@@ -9,10 +9,12 @@
 
 #pragma once
 
+#include "../config/Config.h"
 #include "../OpenRCT2.h"
 #include "../management/Finance.h"
 #include "../world/Entrance.h"
 #include "../world/Park.h"
+#include "../world/Sprite.h"
 #include "GameAction.h"
 
 DEFINE_GAME_ACTION(ParkEntranceRemoveAction, GAME_COMMAND_REMOVE_PARK_ENTRANCE, GameActionResult)
@@ -76,6 +78,14 @@ public:
         }
 
         auto direction = (gParkEntrances[entranceIndex].direction - 1) & 3;
+
+        if (gConfigGeneral.michael_bay_mode)
+        {
+            audio_play_sound_at_location(SoundId::Crash, { res->Position.x, res->Position.y, res->Position.z });
+
+            sprite_misc_explosion_cloud_create(res->Position.x, res->Position.y, res->Position.z);
+            sprite_misc_explosion_flare_create(res->Position.x, res->Position.y, res->Position.z);
+        }  
 
         // Centre (sign)
         ParkEntranceRemoveSegment(_loc);
