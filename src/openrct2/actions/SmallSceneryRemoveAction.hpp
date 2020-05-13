@@ -127,7 +127,7 @@ public:
 
         res->Position.z = tile_element_height(res->Position);
 
-        if (gConfigGeneral.michael_bay_mode)
+        if (gConfigGeneral.michael_bay_mode & !tileElement->IsGhost())
         {
             audio_play_sound_at_location(SoundId::Crash, {res->Position.x, res->Position.y, res->Position.z});
 

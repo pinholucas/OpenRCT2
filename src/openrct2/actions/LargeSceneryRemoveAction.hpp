@@ -186,7 +186,7 @@ public:
                     if ((flags & GAME_COMMAND_FLAG_GHOST) && sceneryElement->IsGhost() == false)
                         continue;
 
-                    if (gConfigGeneral.michael_bay_mode)
+                    if (gConfigGeneral.michael_bay_mode & !sceneryElement->IsGhost())
                     {
                         audio_play_sound_at_location(SoundId::Crash, {res->Position.x, res->Position.y, res->Position.z});
 
