@@ -9,10 +9,12 @@
 
 #pragma once
 
+#include "../config/Config.h"
 #include "../management/Finance.h"
 #include "../world/Banner.h"
 #include "../world/MapAnimation.h"
 #include "../world/Scenery.h"
+#include "../world/Sprite.h"
 #include "GameAction.h"
 
 DEFINE_GAME_ACTION(BannerRemoveAction, GAME_COMMAND_REMOVE_BANNER, GameActionResult)
@@ -118,6 +120,14 @@ public:
         {
             res->Cost = -((bannerEntry->banner.price * 3) / 4);
         }
+
+        if (gConfigGeneral.michael_bay_mode & !bannerElement->IsGhost())
+        {
+            audio_play_sound_at_location(SoundId::Crash, { res->Position.x, res->Position.y, res->Position.z });
+
+            sprite_misc_explosion_cloud_create(res->Position.x, res->Position.y, res->Position.z);
+            sprite_misc_explosion_flare_create(res->Position.x, res->Position.y, res->Position.z);
+        }  
 
         tile_element_remove_banner_entry(reinterpret_cast<TileElement*>(bannerElement));
         map_invalidate_tile_zoom1({ _loc, _loc.z, _loc.z + 32 });
